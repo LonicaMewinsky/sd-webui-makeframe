@@ -81,25 +81,9 @@ def on_ui_tabs():
         #funcs
         def BreakFrames(filepath, output_dir):
             # Check or create root directory:
-            try:
-                if not Path.exists(Path(output_dir)):
-                    Path.mkdir(Path(output_dir))
-            except:
-                st_out = f"Error: could not locate nor create directory {output_dir}."
-                print(st_out)
-                return gr.update(value = st_out, visible = True)
-            
-            # Create the output subdirectory if it doesn't exist
-            output_breaksdir = Path.joinpath(Path(output_dir), "Breaks")
-            output_subdir = Path.joinpath(output_breaksdir, Path(filepath.name).stem)
-            try:
-                if not Path.exists(output_breaksdir):
-                    Path.mkdir(output_breaksdir)
-                if not Path.exists(output_subdir):
-                    Path.mkdir(output_subdir)
-            except:
-                st_out = f"Error: could not create directory {output_subdir}."
-                print(st_out)
+            output_subdir = Path.joinpath(Path(output_dir), "Breaks", Path(filepath.name).stem)
+            founddir, st_out = mfu.CheckMakeDir(output_subdir)
+            if not founddir:
                 return gr.update(value = st_out, visible = True)
             
             # Open the video file
@@ -158,6 +142,11 @@ def on_ui_tabs():
             return None, None, None, None, None, gr.update(visible = False), gr.update(visible = False)
         
         def MakeKeyFrameGrid(input_path, output_dir, rows, cols, maxw, maxh, fontsize, fontcolor, usehistogram):
+            # Check output path
+            output_subdir = Path.joinpath(Path(output_dir), "Grids")
+            founddir, st_out = mfu.CheckMakeDir(output_subdir)
+            if not founddir:
+                return gr.update(value = st_out, visible = True)
             # Check input path
             try:
                 input_path = Path(input_path)
@@ -165,7 +154,6 @@ def on_ui_tabs():
                 st_out = f"Could not locate path {input_path}."
                 print(st_out)
                 return st_out, None
-            
             # Try gather files
             try:
                 filepaths = list(input_path.iterdir())
@@ -173,25 +161,6 @@ def on_ui_tabs():
                 st_out = f"Could not locate files in {input_path}."
                 print(st_out)
                 return st_out, None
-            
-            # Check or create root directory:
-            try:
-                if not Path.exists(Path(output_dir)):
-                    Path.mkdir(Path(output_dir))
-            except:
-                st_out = f"Error: could not locate nor create directory {output_dir}."
-                print(st_out)
-                return gr.update(value = st_out, visible = True)
-            
-            # Create the output subdirectory if it doesn't exist
-            output_subdir = Path.joinpath(Path(output_dir), "Grids")
-            try:
-                if not Path.exists(output_subdir):
-                    Path.mkdir(output_subdir)
-            except:
-                st_out = f"Error: could not create directory {output_subdir}."
-                print(st_out)
-                return gr.update(value = st_out, visible = True)
             
             # Make tensors
             image_tensors = [mfu.load_and_preprocess(path) for path in filepaths]
@@ -232,26 +201,10 @@ def on_ui_tabs():
             return st_out, grids_out
 
         def BreakKeyFrameGrid(input_img, output_dir, rows, cols):
-            # Check or create root directory:
-            try:
-                if not Path.exists(Path(output_dir)):
-                    Path.mkdir(Path(output_dir))
-            except:
-                st_out = f"Error: could not locate nor create directory {output_dir}."
-                print(st_out)
-                return gr.update(value = st_out, visible = True)
-            
-            # Create the output subdirectory if it doesn't exist
-            output_breaksdir = Path.joinpath(Path(output_dir), "Keyframes")
-            output_subdir = Path.joinpath(output_breaksdir, Path(input_img.name).stem)
-            try:
-                if not Path.exists(output_breaksdir):
-                    Path.mkdir(output_breaksdir)
-                if not Path.exists(output_subdir):
-                    Path.mkdir(output_subdir)
-            except:
-                st_out = f"Error: could not create directory {output_subdir}."
-                print(st_out)
+            # Check output path
+            output_subdir = Path.joinpath(Path(output_dir), "Keyframes", Path(input_img.name).stem)
+            founddir, st_out = mfu.CheckMakeDir(output_subdir)
+            if not founddir:
                 return gr.update(value = st_out, visible = True)
             
             # Break

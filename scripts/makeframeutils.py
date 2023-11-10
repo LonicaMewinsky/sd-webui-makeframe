@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from pathlib import Path
 import os
 from PIL import Image, ImageDraw, ImageFont
 
@@ -142,3 +143,13 @@ def get_iterated_path(directory, base_filename, extension='.png'):
         count += 1
     
     return full_file_path
+
+def CheckMakeDir(dir):
+    try:
+        if not Path.exists(Path(dir)):
+            Path.mkdir(Path(dir), parents=True, exist_ok=True)
+        return True, "Success"
+    except:
+        st_out = f"Error: could not locate nor create directory {dir}."
+        print(st_out)
+        return False, st_out
