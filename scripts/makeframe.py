@@ -217,13 +217,18 @@ def on_ui_tabs():
             return st_out
 
         def MakeAnimation(input_path, output_dir, width, height, fps, ext):
+            # Check output path
+            output_subdir = Path.joinpath(Path(output_dir), "Animations")
+            founddir, st_out = mfu.CheckMakeDir(output_subdir)
+            if not founddir:
+                return gr.update(value = st_out, visible = True)
+            # Check input path
             try:
                 input_path = Path(input_path)
             except:
                 st_out = f"Could not locate path {input_path}."
                 print(st_out)
                 return st_out, None
-            
             # Try gather files
             try:
                 filepaths = list(input_path.iterdir())
@@ -231,25 +236,6 @@ def on_ui_tabs():
                 st_out = f"Could not locate files in {input_path}."
                 print(st_out)
                 return st_out, None
-            
-            # Check or create root directory:
-            try:
-                if not Path.exists(Path(output_dir)):
-                    Path.mkdir(Path(output_dir))
-            except:
-                st_out = f"Error: could not locate nor create directory {output_dir}."
-                print(st_out)
-                return gr.update(value = st_out, visible = True)
-            
-            # Create the output subdirectory if it doesn't exist
-            output_subdir = Path.joinpath(Path(output_dir), "Animations")
-            try:
-                if not Path.exists(output_subdir):
-                    Path.mkdir(output_subdir)
-            except:
-                st_out = f"Error: could not create directory {output_subdir}."
-                print(st_out)
-                return gr.update(value = st_out, visible = True)
             
             # If animated image format..
             if ext in types_gif:
