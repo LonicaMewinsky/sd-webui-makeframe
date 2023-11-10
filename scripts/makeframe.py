@@ -195,7 +195,7 @@ def on_ui_tabs():
             
             # Make tensors
             image_tensors = [mfu.load_and_preprocess(path) for path in filepaths]
-            N = np.clip((rows*cols), 2, len(image_tensors)-2) # Number of scene changes to find. Rows X Columns with extra space for first frame.
+            N = np.clip((rows*cols), 2, len(image_tensors)-1) # Number of scene changes to find. Rows X Columns with extra space for first frame.
             if usehistogram:
                 histograms = [mfu.compute_histogram(tensor) for tensor in image_tensors]
                 differences = [torch.norm(histograms[i + 1] - histograms[i], p=1) for i in range(len(histograms) - 1)]
@@ -206,13 +206,13 @@ def on_ui_tabs():
             keyframe_indices.insert(0, 0)
 
             # Pad the list with extras; black space frustrates generation
-            if len(keyframe_indices)+1 < rows*cols:
+            if len(keyframe_indices) < rows*cols:
                 keyframe_indices = mfu.padlist(keyframe_indices, rows*cols)
 
             grids_out = []
             # Size needs to be divisible by 8 AND the grid dimension
-            if not rows == 8: maxw = mfu.closest_lcm(maxw, 8, rows)
-            if not cols == 8: maxh = mfu.closest_lcm(maxh, 8, cols)
+            if not rows == 8: maxh = mfu.closest_lcm(maxh, 8, rows)
+            if not cols == 8: maxw = mfu.closest_lcm(maxw, 8, cols)
             # Build base grid
             keyframes = [Image.open(filepaths[i]) for i in keyframe_indices]
             keyframes = mfu.normalize_size(keyframes) #normalize sizes to /8
