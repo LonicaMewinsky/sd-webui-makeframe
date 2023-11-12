@@ -20,25 +20,27 @@ def on_ui_tabs():
     with gr.Blocks() as makeframe_ui:
         # Top button row
         mf_working_path = gr.Textbox(value=mfdir, label="Working directory")
-        with gr.Row(): 
+        with gr.Row():
             with gr.Box():
-                with gr.Column():
-                    gr.HTML(value="Break animation to frames")
-                    upload_anim = gr.File(label="Upload Animation", file_types = types_all, live=True, file_count = "single")
-                    break_anim = gr.Button("Break", visible= False)
-                    break_status = gr.HTML(None, visible=False)
-                    with gr.Box():
-                        loaded_width = gr.Number(value=0, interactive = False, label = "Width")
-                        loaded_height = gr.Number(value=0, interactive = False, label = "Height")
-                        loaded_fps = gr.Number(value=0, interactive = False, label = "FPS")
-                        loaded_runtime = gr.Number(value=0, interactive = False, label = "Runtime")
-                        loaded_frames = gr.Number(value=0, interactive = False, label = "Total frames")
+                with gr.Tab("Break Animation"):
+                    with gr.Column():
+                        upload_anim = gr.File(label="Upload Animation", file_types = types_all, live=True, file_count = "single")
+                        break_anim = gr.Button("Break", visible= False)
+                        break_status = gr.HTML(None, visible=False)
+                        with gr.Box():
+                            with gr.Row():
+                                with gr.Column(min_width=32):
+                                    loaded_width = gr.Number(value=0, interactive = False, label = "Width")
+                                    loaded_height = gr.Number(value=0, interactive = False, label = "Height")
+                                    loaded_fps = gr.Number(value=0, interactive = False, label = "FPS")
+                                with gr.Column(min_width=32):
+                                    loaded_runtime = gr.Number(value=0, interactive = False, label = "Runtime")
+                                    loaded_frames = gr.Number(value=0, interactive = False, label = "Total frames")
             with gr.Box():
-                with gr.Column():
-                    gr.HTML(value="Keyframe sheet operations")
-                    with gr.Tabs():
-                        with gr.Tab("Make Keyframe Grid"):
-                            with gr.Box():
+                with gr.Tab("Keyframe Grids"):
+                    with gr.Column():
+                        with gr.Tabs():
+                            with gr.Tab("Make Grid"):
                                 makegrid_input_path = gr.Textbox(label="Input directory")
                                 with gr.Row():
                                     with gr.Column(min_width=32):
@@ -51,8 +53,7 @@ def on_ui_tabs():
                                     makegrid_button = gr.Button("Make grid", visible= True)
                                 makegrid_output_gallery = gr.Gallery()
                                 makegrid_status = gr.HTML(None, visible=True)
-                        with gr.Tab("Break Keyframe grid"):
-                            with gr.Box():
+                            with gr.Tab("Break Grid"):
                                 breakgrid_input_image = gr.File(label="Upload grid", file_types = ['.png', '.jpg'], live=True, file_count = "single")
                                 with gr.Row():
                                     with gr.Column():
@@ -60,21 +61,21 @@ def on_ui_tabs():
                                         breakgrid_cols = gr.Slider(2, 20, 8, step=1, label="Grid columns", interactive=True)
                                 break_grid = gr.Button("Break", visible= True)
                                 break_grid_status = gr.HTML(None, visible=False)
-                        with gr.Tab("Options"):
-                            with gr.Box():
+                            with gr.Tab("Options"):
                                 with gr.Row():
                                     label_size = gr.Number(72, precision=1, label="Grid label font size")
                                     label_color = gr.ColorPicker("#ffffff", label="Grid label font color")
                                     use_histogram = gr.Checkbox(False, label="Use histograms for scene changes")
-                                
-            with gr.Column():
-                gr.HTML(value="Make animation from frames")
-                with gr.Box():
+            with gr.Box():
+                with gr.Tab("Make Animation"):
                     makeanim_input_path = gr.Textbox(label="Input directory")
-                    makeanim_width = gr.Number(128, precision=1, label="Output width")
-                    makeanim_height = gr.Number(128, precision=1, label="Output height")
-                    makeanim_fps = gr.Number(15.0, label="Output FPS")
-                    makeanim_ext = gr.Dropdown(types_out, value='.gif', label="Extension")
+                    with gr.Row():
+                        with gr.Column(min_width=32):
+                            makeanim_width = gr.Number(128, precision=1, label="Output width")
+                            makeanim_height = gr.Number(128, precision=1, label="Output height")
+                        with gr.Column(min_width=32):
+                            makeanim_fps = gr.Number(15.0, label="Output FPS")
+                            makeanim_ext = gr.Dropdown(types_out, value='.gif', label="Extension")
                     makeanim_button = gr.Button("Make Animation")
                     makeanim_status = gr.HTML(None, visible=True)
 
@@ -213,8 +214,8 @@ def on_ui_tabs():
                 output_file_name = f"frame_{str(i).zfill(5)}.png"  # e.g., frame_00001.png
                 output_file_path = str(Path.joinpath(output_subdir, output_file_name))
                 frame.save(output_file_path)
-            st_out = f"{len(brokenlist)+1} frames written to {output_subdir}."
-            return st_out
+            st_out = f"{len(brokenlist)} frames written to {output_subdir}."
+            return gr.update(value = st_out, visible = True)
 
         def MakeAnimation(input_path, output_dir, width, height, fps, ext):
             # Check output path
